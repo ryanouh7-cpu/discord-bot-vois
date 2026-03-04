@@ -17,40 +17,29 @@ function startBot(botData, index) {
     ],
   });
 
-  async function connectToVoice() {
+  client.once('ready', async () => {
+    console.log(`Bot ${index + 1} logged in as ${client.user.tag}`);
+
     try {
       const channel = await client.channels.fetch(botData.channel);
-      if (!channel) return console.log(`Channel ${index + 1} not found`);
+
+      if (!channel || channel.type !== 2) {
+        console.log(`Bot ${index + 1}: Channel not valid voice`);
+        return;
+      }
 
       joinVoiceChannel({
         channelId: channel.id,
         guildId: channel.guild.id,
         adapterCreator: channel.guild.voiceAdapterCreator,
-        selfDeaf: false
+        selfDeaf: true
       });
 
       console.log(`Bot ${index + 1} joined voice ✅`);
+
     } catch (err) {
-      console.log(`Reconnect error Bot ${index + 1}`);
-      setTimeout(connectToVoice, 5000);
+      console.log(`Bot ${index + 1} failed to join`, err.message);
     }
-  }
-
-  client.once('ready', () => {
-    console.log(`Bot ${index + 1} logged in as ${client.user.tag}`);
-    connectToVoice();
-  });
-
-  client.on('voiceStateUpdate', (oldState, newState) => {
-    if (oldState.member?.id === client.user.id && !newState.channelId) {
-      console.log(`Bot ${index + 1} disconnected. Rejoining...`);
-      setTimeout(connectToVoice, 3000);
-    }
-  });
-
-  client.on('error', () => {
-    console.log(`Error in Bot ${index + 1}. Restarting...`);
-    setTimeout(() => startBot(botData, index), 5000);
   });
 
   client.login(botData.token);
