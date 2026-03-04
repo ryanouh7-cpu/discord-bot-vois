@@ -1,13 +1,11 @@
 const { Client, GatewayIntentBits } = require('discord.js');
-const { joinVoiceChannel, getVoiceConnection } = require('@discordjs/voice');
+const { joinVoiceChannel } = require('@discordjs/voice');
 
 const bots = [
   { token: process.env.TOKEN1, channel: process.env.CHANNEL1 },
   { token: process.env.TOKEN2, channel: process.env.CHANNEL2 },
   { token: process.env.TOKEN3, channel: process.env.CHANNEL3 },
   { token: process.env.TOKEN4, channel: process.env.CHANNEL4 },
-  { token: process.env.TOKEN5, channel: process.env.CHANNEL5 },
-  { token: process.env.TOKEN6, channel: process.env.CHANNEL6 },
 ];
 
 function startBot(botData, index) {
@@ -33,7 +31,7 @@ function startBot(botData, index) {
 
       console.log(`Bot ${index + 1} joined voice ✅`);
     } catch (err) {
-      console.log(`Reconnect error Bot ${index + 1}`, err);
+      console.log(`Reconnect error Bot ${index + 1}`);
       setTimeout(connectToVoice, 5000);
     }
   }
@@ -44,8 +42,8 @@ function startBot(botData, index) {
   });
 
   client.on('voiceStateUpdate', (oldState, newState) => {
-    if (oldState.member.id === client.user.id && !newState.channelId) {
-      console.log(`Bot ${index + 1} got disconnected. Rejoining...`);
+    if (oldState.member?.id === client.user.id && !newState.channelId) {
+      console.log(`Bot ${index + 1} disconnected. Rejoining...`);
       setTimeout(connectToVoice, 3000);
     }
   });
